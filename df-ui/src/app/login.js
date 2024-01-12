@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { IconButton, InputAdornment } from '@mui/material';
+import { Dialog, DialogContent, DialogContentText, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {useState} from 'react';
 
@@ -24,12 +24,19 @@ const defaultTheme = createTheme();
 export default function LoginPage() {
 
     const [showPassword, setShowPasswod] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
 
     const handleShowPassword = (event) => {
 
         setShowPasswod(prev => {
             return !prev;
         })
+    };
+
+    const handleForgotPassword = (event) => {
+        setShowForgotPassword(prev => {
+            return !prev;
+        });
     };
 
 
@@ -44,6 +51,55 @@ export default function LoginPage() {
 
     return (
         <ThemeProvider theme={defaultTheme}>
+            <Dialog
+                fullWidth={true}
+                maxWidth="sm"
+                open={showForgotPassword}
+            >
+                <DialogContent>
+                    <DialogContentText>
+                        <Grid container justifyContent="center">
+                            <Typography style={{color: "#7e4fa7"}} mt={2} sx={{fontWeight: 'bold'}}>
+                                Did you forget your password?
+                            </Typography>
+                            <Typography>
+                                <p>Enter your email address and we'll send you a link to restore password</p>
+                            </Typography>
+                        </Grid>
+
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'flex-start'
+                                }}
+                            >
+                                
+                                <Grid container spacing={1} >
+                                    <Grid item xs={6}>
+                                    <Typography>
+                                        Email Address
+                                    </Typography>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField fullWidth variant='outlined' />
+                                    </Grid>
+                                    <Grid container item justifyContent="center">
+                                        <Button fullWidth variant='contained'>Request reset link</Button>
+                                    </Grid>
+                                    <Grid container item justifyContent="center">
+                                        <Link href="#" variant="body2" onClick={handleForgotPassword}>
+                                            Back to log in
+                                        </Link>
+                                    </Grid>
+                                </Grid>    
+                            </Box>
+
+                    </DialogContentText>
+                </DialogContent>
+
+            </Dialog>
+            
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <Box
@@ -91,7 +147,7 @@ export default function LoginPage() {
                         />
                         <Grid container >
                             <Grid item xs container justifyContent="flex-end">
-                                <Link href="#" variant="body2">
+                                <Link href="#" variant="body2" onClick={handleForgotPassword}>
                                     Forgot password?
                                 </Link>
                             </Grid>
