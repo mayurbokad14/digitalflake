@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Dialog, DialogContent, DialogContentText, IconButton, InputAdornment } from '@mui/material';
+import { Card, Dialog, DialogContent, DialogContentText, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {useState} from 'react';
 
@@ -102,14 +102,20 @@ export default function LoginPage() {
             
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
+                <Card variant='outlined'
+                sx={{padding:4, marginTop: 20}}
+                >
                 <Box
                     sx={{
-                        marginTop: 8,
+                        
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                     }}
                 >
+                    
+
+                    
                     <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
                         <LockOutlinedIcon />
                     </Avatar>
@@ -162,7 +168,9 @@ export default function LoginPage() {
                         </Button>
                         
                     </Box>
+                    
                 </Box>
+                </Card>
             </Container>
         </ThemeProvider>
     );
