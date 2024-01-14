@@ -4,16 +4,46 @@ import { Delete, Edit, GridView, Search } from "@mui/icons-material";
 import { Box, Button, Grid, IconButton, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Toolbar, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { ActiveViewContext } from "../store/active-view-context";
+import { useContext } from "react";
+import SimpleAlert from "./SimpleAlert";
 
 export default function CategoryView() {
 
     const [categoryList, setCategoryList] = useState([]);
+
+    const {handleActiveView} =useContext(ActiveViewContext);
+
+    const [showSimpleAlert,setShowSimpleAlert] = useState(false);
+
+    const [alertData, setAlertData] = useState({
+        title: "Success",
+        message: "This is sample message"
+    });
+
+    const handleConfirmDelete = id => {
+        setShowSimpleAlert(false);
+    };
+
+    const handleDeleteCategory = id => {
+        setAlertData({
+            title: "Confirm ?",
+            message: "Are you sure you want to delete ?"
+        })
+        setShowSimpleAlert(true);  
+    }
     
     useEffect(
         ()=>{
+            const token = localStorage.getItem('token');
+        
+            if (token) {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            }
+            
             axios({
                 method: "get",
-                url: "http://localhost:3001/categories"
+                url: "http://localhost:3001/api/categories"
             }).then(response=>{
                 setCategoryList(response.data);
             })
@@ -22,7 +52,12 @@ export default function CategoryView() {
         }, []
     );
 
+
     return (
+        <>
+        {
+            showSimpleAlert ? <SimpleAlert handleOkay={handleConfirmDelete} title={alertData.title} message={alertData.message} /> : null
+        }
         <Box component="main" sx={{ flexGrow: 1, p: 3, marginLeft: 30, marginTop:10 }}>
             
             <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} >
@@ -43,8 +78,8 @@ export default function CategoryView() {
                         </InputAdornment>
                     }} />
                 </Grid>
-                <Grid item xs={2}>
-                    <Button variant="contained">Add new</Button>
+                <Grid item xs={4} textAlign="right">
+                    <Button variant="contained" onClick={()=> handleActiveView("AddCategory")}>Add new</Button>
                 </Grid>
             </Grid>
             <Grid container >
@@ -71,7 +106,9 @@ export default function CategoryView() {
                                             <IconButton>
                                                 <Edit />
                                             </IconButton>
-                                            <IconButton>
+                                            <IconButton onClick={()=>{
+                                                handleDeleteCategory(row.id);
+                                            }}>
                                                 <Delete />
                                             </IconButton>
                                         </TableCell>
@@ -83,6 +120,7 @@ export default function CategoryView() {
                 </TableContainer>
             </Grid>
         </Box>
+        </>
     );
 
 };

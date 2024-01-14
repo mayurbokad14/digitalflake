@@ -13,11 +13,13 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import { Category, GridView, Home } from '@mui/icons-material';
 
-export default function DFAppDrawer() {
+export default function DFAppDrawer(props) {
     const drawerWidth = 240;
 
     const [pageSelected,setPageSelected] = React.useState("Home");
 
+    
+ 
     const pageIcons = {
         Home : <Home />,
         Category : <GridView />,
@@ -25,6 +27,7 @@ export default function DFAppDrawer() {
     }
 
     const handlePageChange = (text) => {
+        props.handleActiveView(text);
         setPageSelected(prev=> {
             return text;
         });

@@ -8,14 +8,21 @@ import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Card, Dialog, DialogContent, DialogContentText, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import {useState} from 'react';
+import {useState, useContext, useEffect} from 'react';
+import SimpleAlert from './components/SimpleAlert';
 
+import { UserLoggedIn } from './store/active-view-context';
+
+import sitelogo from "./DF_Icon-200x200.png";
+
+import axios from 'axios';
+
+const violetBase = '#531e6d';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
@@ -25,6 +32,26 @@ export default function LoginPage() {
 
     const [showPassword, setShowPasswod] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+    const {handleLoginState} = useContext(UserLoggedIn);
+
+    const [username, setUsername] = useState(null);
+    const [password, setPassword] = useState(null);
+
+    const [alertData, setAlertData] = useState({
+        title: "Success",
+        message: "This is sample message"
+    });
+    const [showSimpleAlert, setShowSimpleAlert] = useState(false);
+
+
+    const handleUsernameChange = (event) => {
+        setUsername(event.target.value);
+    };
+
+    const handlePasswordChange = (event) => {
+        setPassword(event.target.value);
+    };
 
     const handleShowPassword = (event) => {
 
@@ -40,17 +67,49 @@ export default function LoginPage() {
     };
 
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        //const data = new FormData(event.currentTarget);
+        try {
+            const response = await axios.post('http://localhost:3001/login', { username, password });
+            
+            const { token } = response.data;
+            console.log(token);
+
+            // Store the token in localStorage or a more secure storage method
+            localStorage.setItem('token', token);
+
+            handleLoginState(false);
+
+            
+        } catch (error) {
+            console.error('Login failed:', error);
+            setAlertData({
+                title: "Alert",
+                message: error.response.data.error
+            });
+            setShowSimpleAlert(true);
+        }
+    };
+
+    useEffect(() => {
+        // Check if the user is already logged in (token exists)
+        const token = localStorage.getItem('token');
+        if (token) {
+            handleLoginState(false);
+        }
+    }, []);
+
+    
+    const closeAlert = () =>{
+        setShowSimpleAlert(false);
     };
 
     return (
         <ThemeProvider theme={defaultTheme}>
+            {
+            showSimpleAlert ? <SimpleAlert handleOkay={closeAlert} title={alertData.title} message={alertData.message} /> : null
+        }
             <Dialog
                 fullWidth={true}
                 maxWidth="sm"
@@ -59,7 +118,7 @@ export default function LoginPage() {
                 <DialogContent>
                     <DialogContentText>
                         <Grid container justifyContent="center">
-                            <Typography style={{color: "#7e4fa7"}} mt={2} sx={{fontWeight: 'bold'}}>
+                            <Typography style={{color: "#531e6d"}} mt={2} sx={{fontWeight: 'bold'}}>
                                 Did you forget your password?
                             </Typography>
                             <Typography>
@@ -117,7 +176,7 @@ export default function LoginPage() {
 
                     
                     <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
+                        <img src={sitelogo.src} style={{width: "48px"}} />
                     </Avatar>
                     <Typography component="h1" variant="h4" >
                         <strong>digital</strong>flake
@@ -137,6 +196,7 @@ export default function LoginPage() {
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            onChange={handleUsernameChange}
                         />
                         <TextField
                             margin="normal"
@@ -147,6 +207,7 @@ export default function LoginPage() {
                             type={showPassword ? "text" : "password"}
                             id="password"
                             autoComplete="current-password"
+                            onChange={handlePasswordChange}
                             InputProps={{
                                 endAdornment : <InputAdornment position='end' ><IconButton aria-label="toggle password visibility" edge="end" onClick={handleShowPassword}> { showPassword ? <Visibility /> : <VisibilityOff /> }  </IconButton>  </InputAdornment>
                             }}
@@ -162,13 +223,12 @@ export default function LoginPage() {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
+                            sx={{ mt: 3, mb: 2 ,bgcolor: "violet.dark"}}
                         >
                             Log In
                         </Button>
-                        
-                    </Box>
-                    
+
+                    </Box> 
                 </Box>
                 </Card>
             </Container>

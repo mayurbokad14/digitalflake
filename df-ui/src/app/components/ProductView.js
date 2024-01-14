@@ -2,18 +2,28 @@
 import { Category , Search } from "@mui/icons-material";
 import { TableCell, Box, Grid,  Typography, TextField, InputAdornment, IconButton, Button, TableContainer, Paper, Table, TableHead, TableRow, TableBody } from "@mui/material";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import { ActiveViewContext } from "../store/active-view-context";
+
 
 export default function ProductView() {
 
     const [productList, setProductList] = useState([]);
+
+    const {handleActiveView} = useContext(ActiveViewContext);
     
     useEffect(
         ()=>{
+            const token = localStorage.getItem('token');
+        
+            if (token) {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            }
+            
             axios({
                 method: "get",
-                url: "http://localhost:3001/products"
+                url: "http://localhost:3001/api/products"
             }).then(response=>{
                 setProductList(response.data.rows);
             })
@@ -43,8 +53,8 @@ export default function ProductView() {
                         </InputAdornment>
                     }} />
                 </Grid>
-                <Grid item xs={2}>
-                    <Button variant="contained">Add new</Button>
+                <Grid item xs={4} textAlign="right">
+                    <Button onClick={()=> handleActiveView("Addproducts")} variant="contained" > Add new </Button>
                 </Grid>
             </Grid>
 
@@ -72,7 +82,9 @@ export default function ProductView() {
                                             <TableCell>{row.packsize}</TableCell>
                                             <TableCell>{row.category.name}</TableCell>
                                             <TableCell>{row.MRP}</TableCell>
-                                            <TableCell>{row.image}</TableCell>
+                                            <TableCell>
+                                                <img src={`http://localhost:3001${row.image}`} style={{height:"60px"}} />
+                                            </TableCell>
                                             <TableCell>{row.isActive ? "Active" : "inactive"}</TableCell>
                                         </TableRow>
                                     );
