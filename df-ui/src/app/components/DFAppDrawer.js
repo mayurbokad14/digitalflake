@@ -11,9 +11,24 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import { Category, GridView, Home } from '@mui/icons-material';
 
 export default function DFAppDrawer() {
     const drawerWidth = 240;
+
+    const [pageSelected,setPageSelected] = React.useState("Home");
+
+    const pageIcons = {
+        Home : <Home />,
+        Category : <GridView />,
+        Products : <Category />
+    }
+
+    const handlePageChange = (text) => {
+        setPageSelected(prev=> {
+            return text;
+        });
+    };
 
     return (
             <Drawer
@@ -28,10 +43,10 @@ export default function DFAppDrawer() {
                 <Box sx={{ overflow: 'auto' }}>
                     <List>
                         {["Home","Category","Products"].map((text, index) => (
-                            <ListItem key={text} disablePadding>
-                                <ListItemButton>
+                            <ListItem key={text} disablePadding  >
+                                <ListItemButton selected={text === pageSelected} onClick={(e) => handlePageChange(text)}>
                                     <ListItemIcon>
-                                        {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                        {pageIcons[text]}
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
                                 </ListItemButton>
